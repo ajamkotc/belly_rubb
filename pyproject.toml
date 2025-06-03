@@ -1,0 +1,32 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "belly_rubb"
+version = "0.0.1"
+description = "An analysis of Belly Rubb's customer data and patterns."
+authors = [
+  { name = "Arsen Jamkotchian" },
+]
+
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    
+]
+requires-python = "~=3.10.0"
+
+
+[tool.ruff]
+line-length = 99
+src = ["belly_rubb"]
+include = ["pyproject.toml", "belly_rubb/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["belly_rubb"]
+force-sort-within-sections = true
+
