@@ -17,45 +17,53 @@ This data science project analyzes customer ordering patterns at a local restaur
 ## Project Organization
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
+├── LICENSE                     <- Open-source license if one is chosen
+|
+├── Makefile                    <- Makefile with convenience commands.
+|
+├── README.md                   <- The top-level README for developers using this project.
+|
 ├── data
-│   ├── external       <- Data from third party sources.
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
+│   ├── external                <- Data from third party sources.
+│   ├── interim                 <- Intermediate data that has been transformed.
+│   ├── processed               <- The final, canonical data sets for modeling.
+│   └── raw                     <- The original, immutable data dump.
+|
+│── app
+|   ├── config.py               <- Store useful variables and configuration.
+|   ├── db_models.py            <- ORM model for 'access_tokens' table.
+|   ├── db.py                   <- SQLAlchemy database engine setup.
+|   ├── pkce_flow.py            <- OAUTH2 PKCE flow.
+│   └── templates
+|       ├── callback.html       <- HTML template for callback success page.
+|       └── home.html           <- HTML template for homepage.
+|
+├── docs                        <- A default mkdocs project; see www.mkdocs.org for details
 │
-├── docs               <- A default mkdocs project; see www.mkdocs.org for details
+├── models                      <- Trained and serialized models.
 │
-├── models             <- Trained and serialized models, model predictions, or model summaries
+├── notebooks                   <- Jupyter notebooks.
 │
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
+├── pyproject.toml              <- Project configuration file with package metadata.
 │
-├── pyproject.toml     <- Project configuration file with package metadata for 
-│                         belly_rubb and configuration for tools like black
+├── references                  <- Data dictionaries, manuals, and other explanatory materials.
 │
-├── references         <- Data dictionaries, manuals, and all other explanatory materials.
+├── reports                     <- Generated analysis as HTML, PDF, LaTeX, etc.
+│   └── figures                 <- Generated graphics and figures to be used in reporting.
 │
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
+├── environment.yml             <- The environment file for reproducing the analysis environment.
 │
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
+├── setup.cfg                   <- Configuration file for flake8.
 │
-├── setup.cfg          <- Configuration file for flake8
-│
-└── belly_rubb   <- Source code for use in this project.
+└── belly_rubb                  <- Source code for use in this project.
     │
-    ├── __init__.py             <- Makes belly_rubb a Python module
+    ├── __init__.py             <- Makes belly_rubb a Python module.
     │
-    ├── config.py               <- Store useful variables and configuration
+    ├── config.py               <- Store useful variables and configuration.
     │
-    ├── dataset.py              <- Scripts to download or generate data
+    ├── dataset.py              <- Scripts to download or generate data.
     │
-    ├── features.py             <- Code to create features for modeling
+    ├── features.py             <- Code to create features for modeling.
     │
     ├── modeling                
     │   ├── __init__.py 
@@ -72,23 +80,30 @@ This data science project analyzes customer ordering patterns at a local restaur
 |------------------------|-------------------------------------|
 | Data Source            | Square (CSV/API)                    |
 | Language               | Python                              |
-| Data Storage           | SQLite (optionally PostgreSQL/Supabase) |
-| Data Pipeline          | `schedule`, `cron`, or `Airflow`    |
+| Data Storage           | SQLite                              |
+| Data Pipeline          |                                     |
 | EDA & Visualization    | pandas, matplotlib, seaborn         |
-| Machine Learning       | scikit-learn, XGBoost               |
-| Deployment             | Streamlit                           |
+| Machine Learning       | scikit-learn                        |
+| Deployment             |                                     |
 | Version Control        | Git + GitHub                        |
 
 ---
 
-## 📈 Key Insights (Preview)
+## 📈 Key Insights
 
-- Sales peak on [X] and dip on [Y].
-- Average order value increases during [time period].
-- [Specific product or category] drives the most consistent revenue.
-- Predictive model achieves an MAE of [value], helping forecast sales with [accuracy]%.
+*Note: Insights will be shared after model evaluation is complete.*
 
-*Note: Final insights will be shared after model evaluation is complete.*
+---
+
+## ✅ Project Development Checklist
+- ✅ Determine data mining goals.
+- ✅ Establish OAuth flow and connection to Square API.
+- ☐ Collect and clean data.
+- ☐ Perform exploratory data analysis (EDA) to gain insights and assess the business problem and context.
+- ☐ Transform data and engineer features to prepare for modeling.
+- ☐ Develop a model to address project's objectives.
+- ☐ Evaluate model performance.
+- ☐ Deploy model.
 
 ---
 
@@ -96,14 +111,24 @@ This data science project analyzes customer ordering patterns at a local restaur
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/restaurant-sales-prediction.git
-    cd restaurant-sales-prediction
+    git clone https://github.com/ajamkotc/belly_rubb
+    cd belly_rubb
     ```
-2. Set up the Environment:
+2. Set up the Python virtual environment:
     ```bash
     conda env create -f environment.yml
     conda activate belly_rubb
     ```
+3. Set up the `.env` file:
+    ```bash
+    SQUARE_APPLICATION_ID=your_square_application_id
+    SQUARE_APPLICATION_SECRET=your_square_application_secret
+    REDIRECT_URI=http://localhost:5000/callback
+    ```
+    - `SQUARE_APPLICATION_ID` and `SQUARE_APPLICATION_SECRET` can be obtained from your [Square Developer Dashboard](https://developer.squareup.com/docs/devtools/developer-dashboard).
+    - `REDIRECT_URI` should match the redirect URL configured in your Square application settings.
+    - For local development use `http://localhost:5000/callback`.
+    - NEVER commit `.env` files to version control. Use `.gitignore` to exclude them.
 3. Run the Pipeline
    ```bash
     # Run data processing scripts
@@ -113,6 +138,11 @@ This data science project analyzes customer ordering patterns at a local restaur
     python src/models/train_model.py
     ```
 4. Launch the Dashboard
-    
---------
 
+### ⚠️ Access Disclaimer
+
+> This project demonstrates how to authenticate with the Square API and store access tokens securely using OAuth 2.0.
+>
+> You must use your own Square application credentials to run this app. Access to restaurant data requires permission from the account owner and valid API credentials.
+>
+> **Do not share or commit any real Square secrets or tokens.**

@@ -188,3 +188,7 @@ cython_debug/
 # Access tokens
 .secrets.json
 secrets.json
+
+# sqlite stuff
+*.sqlite3
+bellyrub.db
