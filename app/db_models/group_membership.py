@@ -12,7 +12,6 @@ Methods:
 """
 from sqlalchemy import Column, String, Integer, ForeignKey
 from app.db import Base
-print(f"Base defined in group_membership.py: {id(Base)}")
 
 class GroupMembership(Base):
     """

@@ -16,7 +16,6 @@ Attributes:
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Boolean
 from app.db import Base
-print(f"Base defined in access_token.py: {id(Base)}")
 
 class AccessToken(Base):
     """

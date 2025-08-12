@@ -9,7 +9,6 @@ Classes:
 """
 from sqlalchemy import Column, String
 from app.db import Base
-print(f"Base defined in group.py: {id(Base)}")
 
 class Group(Base):
     """

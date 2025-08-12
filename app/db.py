@@ -13,6 +13,7 @@ Functions:
         Should be called once during application startup to ensure all tables are created.
         Raises SQLAlchemyError if there is an error during table creation.
 """
+#pylint: disable=[C0415,W0611]
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
