@@ -13,13 +13,26 @@ Attributes:
     short_lived (bool): Indicates if the token is short-lived. Defaults to False.
     refresh_token_expires_at (datetime): Expiration datetime of the refresh token.
 """
-import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Boolean
-from sqlalchemy.ext.declarative import declarative_base
+from app.db import Base
+print(f"Base defined in access_token.py: {id(Base)}")
 
-Base = declarative_base()
+class AccessToken(Base):
+    """
+    Represents an access token for a merchant.
 
-class AccessToken(Base):  #pylint: disable=C0115,R0903
+    Attributes:
+        merchant_id (str): The unique identifier for the merchant. Primary key.
+        access_token (str): The access token string.
+        token_type (str): The type of the token (e.g., Bearer).
+        expires_at (datetime): The expiration datetime of the access token.
+        refresh_token (str): The refresh token string.
+        short_lived (bool): Indicates if the token is short-lived. Defaults to False.
+        refresh_token_expires_at (datetime): The expiration datetime of the refresh token.
+        created_at (datetime): The datetime when the token was created.
+            Defaults to current UTC time.
+    """
     __tablename__ = 'access_tokens'
 
     merchant_id = Column(String, primary_key=True)
@@ -29,7 +42,7 @@ class AccessToken(Base):  #pylint: disable=C0115,R0903
     refresh_token = Column(String)
     short_lived = Column(Boolean, default=False)
     refresh_token_expires_at = Column(DateTime)
-    created_at = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<AccessToken(merchant_id={self.merchant_id}, access_token={self.access_token})>"

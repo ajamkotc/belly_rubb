@@ -31,12 +31,17 @@ This data science project analyzes customer ordering patterns at a local restaur
 |
 │── app
 |   ├── config.py               <- Store useful variables and configuration.
-|   ├── db_models.py            <- ORM model for 'access_tokens' table.
 |   ├── db.py                   <- SQLAlchemy database engine setup.
 |   ├── pkce_flow.py            <- OAUTH2 PKCE flow.
-│   └── templates
-|       ├── callback.html       <- HTML template for callback success page.
-|       └── home.html           <- HTML template for homepage.
+│   ├── templates
+|   |   ├── callback.html       <- HTML template for callback success page.
+|   |   └── home.html           <- HTML template for homepage.
+|   |
+|   ├── db_models               <- ORM models for tables.
+|   |   ├── access_token.py
+|   |   ├── customer.py
+|   |   ├── group_membership.py
+|   |   └── group.py
 |
 ├── docs                        <- A default mkdocs project; see www.mkdocs.org for details
 │

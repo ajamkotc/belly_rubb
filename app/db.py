@@ -14,13 +14,16 @@ Functions:
         Raises SQLAlchemyError if there is an error during table creation.
 """
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.db_models import Base
+from sqlalchemy.orm import sessionmaker, declarative_base
 
+Base = declarative_base()
+
+load_dotenv()
 DB_PATH = os.getenv(key="DB_PATH", default="sqlite:///bellyrub.db")
 
-engine = create_engine(DB_PATH)
+engine = create_engine(DB_PATH, echo=True)
 Session = sessionmaker(bind=engine)
 
 def init_db():
@@ -33,4 +36,9 @@ def init_db():
     Raises:
         SQLAlchemyError: If there is an error during table creation.
     """
+    from app.db_models.customer import Customer
+    from app.db_models.access_token import AccessToken
+    from app.db_models.group import Group
+    from app.db_models.group_membership import GroupMembership
+
     Base.metadata.create_all(engine)
