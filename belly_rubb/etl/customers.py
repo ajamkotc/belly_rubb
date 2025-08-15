@@ -10,8 +10,8 @@ Classes:
         - Handles authentication, API requests, pagination, and database synchronization.
         - Methods:
             - __init__(merchant_id: str): Initializes the API client and synchronization manager.
-            - pull_customers(page_limit: int): Retrieves customer records from the API.
-            - store_customer_info(customer_info: dict): Inserts or updates customer data 
+            - _paginated_customers(page_limit: int): Retrieves customer records from the API.
+            - _store_customer_info(customer_info: dict): Inserts or updates customer data
                                                             in the database.
             - sync_customers(page_limit: int = 50): Synchronizes customer data between the API
                                                             and the database.
@@ -32,6 +32,7 @@ Usage:
 from dateutil import parser
 
 from square import Square
+from square.core.api_error import ApiError
 from loguru import logger
 
 from sqlalchemy.dialects.sqlite import insert
@@ -55,10 +56,9 @@ class CustomerAPI:
         __init__(merchant_id: str):
             Initializes the CustomerAPI with the merchant ID, sets up authentication,
                 and prepares API clients.
-        pull_customers(page_limit: int):
-            Retrieves customer records from the API in a paginated manner,
-                yielding individual customer records.
-        store_customer_info(customer_info: dict) -> None:
+        _paginated_customers(page_limit: int):
+            Generates pages of customer records from the API yielding a list of Customers.
+        _store_customer_info(customer_info: dict) -> None:
             Inserts or updates customer information in the database.
                 Handles conflicts by updating existing records.
         sync_customers(page_limit: int = 50):
@@ -75,53 +75,30 @@ class CustomerAPI:
         # API Manager for handling synchronization state
         self.api_manager = APIManager()
 
-    def pull_customers(self, page_limit: int):
+    def _paginated_customers(self, page_limit: int = 50):
         """
-        Retrieves customer records from the API in a paginated manner.
+        Generates pages of customer records from the API.
 
-        Args:
-            page_limit (int): The maximum number of customer records to retrieve per API request.
+        Params:
+            page_limit (int): Limit of records per page
 
         Yields:
-            dict: Individual customer records obtained from the API.
-
-        Notes:
-            - The method uses a cursor-based pagination to fetch all available customer records.
-            - Records are sorted by 'created_at' in descending order.
-            - If the API request fails or no customers are found, the process stops.
+            list: List of Customer objects from API.
         """
-        # Set initial cursor
-        cursor = None
-
-        # Loop until no more pages
-        while True:
-            # Attempt API request
+        try:
             api_response = self.client.customers.list(
                 limit=page_limit,
-                sort_field='created_at',
-                sort_order='DESC',
-                cursor=cursor
+                sort_field='CREATED_AT',
+                sort_order='DESC'
             )
+        except ApiError as e:
+            logger.error(f"Error fetching paginated customers: {e}")
+            return
 
-            # Check if API response is successful
-            if not api_response.is_success():
-                logger.info("No customers found or API request failed.")
-                break
+        for page in api_response.iter_pages():
+            yield page
 
-            # Extract body from API response
-            data = api_response.body
-
-            # Iterate over customer records
-            yield from self.api_manager.iter_records(
-                records=data.get('customers', []),
-                resource='customers')
-
-            # Get cursor for next page
-            cursor = data.get('cursor')
-            if not cursor:
-                break
-
-    def store_customer_info(self, customer_info: dict) -> None:
+    def _store_customer_info(self, customer_info: dict) -> None:
         """
         Inserts or updates customer information in the database.
 
@@ -139,7 +116,7 @@ class CustomerAPI:
         Returns:
             None
         """
-        address = customer_info.get('address', value={}) # Have default in case empty
+        address = customer_info.get('address', {}) # Have default in case empty
 
         # Attempt to insert Customer into table
         stmt = insert(Customer).values(
@@ -166,22 +143,31 @@ class CustomerAPI:
             session_db.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
             session_db.commit()
 
-    def sync_customers(self, page_limit: int=50):
+    def sync_customers(self, page_limit: int=50) -> None:
         """
         Synchronizes customer data between the API and the database.
 
         Args:
             page_limit (int): The maximum number of records to retrieve per API request.
 
-        Returns:
+        Returns:    
             None
         """
         logger.info("Starting customer synchronization process.")
+        count_of_records = 0
 
         # Loop through customer records
-        for customer in self.pull_customers(page_limit=page_limit):
-            # Store customer record in database
-            self.store_customer_info(customer)
-            logger.debug(f"Stored customer record: {customer.get('id')}")
+        for page in self._paginated_customers(page_limit=page_limit):
+            # Loop through records in page
+            for record in self.api_manager.iter_records(records=page, resource='customers'):
+                # Store customer data
+                self._store_customer_info(record.dict())
 
-        logger.success("Customer synchronization process completed successfully.")
+                count_of_records += 1
+
+        logger.success(f"Customer synchronization process completed successfully. "
+                       f"Stored {count_of_records} records.")
+
+if __name__ == "__main__":
+    customer_sync = CustomerAPI(merchant_id="MLW4W4RYAASNM")
+    customer_sync.sync_customers()

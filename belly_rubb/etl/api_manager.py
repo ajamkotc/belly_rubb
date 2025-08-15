@@ -94,11 +94,9 @@ class APIManager:
         }
         stmt = stmt.on_conflict_do_update(index_elements=['resource'], set_=update_dict)
 
-        logger.info(f"Upserting sync state for resource: {resource}")
+        logger.debug(f"Upserting sync state for resource: {resource}")
 
         session.execute(stmt)
-
-        logger.success(f"Sync state upserted successfully for resource: {resource}")
 
     def iter_records(self, records: list, resource: str):
         """
@@ -115,16 +113,17 @@ class APIManager:
         Yields:
             dict: Records that have been updated since the last synchronization.
         """
-        with Session().begin() as session:
-            try:
-                for record in records:
-                    # Get date record was updated
-                    record_updated = parser.isoparse(record.get('updated_at'))
+        with Session() as session:
+            with session.begin():
+                try:
+                    for record in records:
+                        # Get date record was updated
+                        record_updated = parser.isoparse(record.updated_at)
 
-                    # Check if record updated since last sync
-                    if self._is_recent(resource, record_updated, session):
-                        yield record
-            finally:
-                # Update sync state
-                self._upsert_sync_state(resource, session)
-                logger.debug(f"Sync state updated for resource: {resource}")
+                        # Check if record updated since last sync
+                        if self._is_recent(resource, record_updated, session):
+                            yield record
+                finally:
+                    # Update sync state
+                    self._upsert_sync_state(resource, session)
+                    logger.success(f"Sync state updated for resource: {resource}")

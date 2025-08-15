@@ -55,3 +55,20 @@ Database Schema
     * `resource` (varchar) - primary key - Name of resource.
     * `last_synced` (timestamp) - Date it was last synced.
     * `updated` (timestamp) - Date record was updated.
+
+### payments
+* **Purpose**: Stores payment information for sales.
+* **Columns**:
+
+    * `id` (varchar) - primary key - Unique identifier for payment.
+    * `created_at` (timestamp) - Timestamp when payment was created.
+    * `updated_at` (timestamp) - Timestamp when payment was last updated.
+    * `status` (str) - Current status of the payment.
+    * `amount` (float) - Amount of the payment.
+    * `total_money` (float) - Total money involved in the payment.
+    * `approved_money` (float) - Amount of money approved for the payment.
+    * `currency` (str) - Currency code for the payment.
+    * `card_brand` (str) - Brand of the card used for the payment.
+    * `location_id` (str) - Identifier for the location where payment was made.
+    * `order_id` (str) - foreign key - References the associated order.
+    * `square_product` (str) - Product identifier from Square.

@@ -28,7 +28,7 @@ SCOPES = [
 
 # Authorization parameters
 SCOPE_STRING = '+'.join(SCOPES)
-REDIRECT_URI = "https://d5bb83e899b7.ngrok-free.app/callback"
+REDIRECT_URI = "https://3d2c204044f7.ngrok-free.app/callback"
 SESSION = False
 CODE_CHALLENGE_METHOD = "S256"
 

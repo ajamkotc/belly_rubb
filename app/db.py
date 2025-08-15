@@ -41,5 +41,8 @@ def init_db():
     from app.db_models.access_token import AccessToken
     from app.db_models.group import Group
     from app.db_models.group_membership import GroupMembership
+    from app.db_models.sync_state import SyncState
+    from app.db_models.payment import Payment
+    from app.db_models.order import Order
 
     Base.metadata.create_all(engine)

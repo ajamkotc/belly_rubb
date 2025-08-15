@@ -6,7 +6,7 @@ Classes:
     including the last sync timestamp and last update timestamp.
 """
 #pylint: disable=[E1102]
-from sqlalchemy import Column, String, DateTime, func
+from sqlalchemy import Column, String
 
 from app.db import Base
 
@@ -16,7 +16,7 @@ class SyncState(Base):
 
     Attributes:
         resource (str): The name of the resource being tracked. Acts as the primary key.
-        last_synced (datetime): The timestamp of the last successful synchronization
+        last_synced (str): The timestamp of the last successful synchronization
             for the resource.
     """
     __tablename__ = 'sync_states'

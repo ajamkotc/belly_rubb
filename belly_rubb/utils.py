@@ -18,5 +18,5 @@ def load_config_file(file_path: Path):
 
     with open(file_path, mode='r', encoding='utf-8') as f:
         config_file = json.load(f)
-    
+
     return config_file
