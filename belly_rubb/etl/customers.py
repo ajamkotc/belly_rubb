@@ -29,8 +29,8 @@ Dependencies:
 Usage:
     Instantiate CustomerAPI with a merchant ID and call sync_customers() to sync customer data.
 """
+import time
 from dateutil import parser
-
 from square import Square
 from square.core.api_error import ApiError
 from loguru import logger
@@ -39,6 +39,7 @@ from sqlalchemy.dialects.sqlite import insert
 
 from app.db import Session
 from app.db_models import Customer
+from belly_rubb.config import MAX_RETRIES, INITIAL_DELAY, DECAY_BASE
 from belly_rubb.etl.token_provider import TokenProvider
 from belly_rubb.etl.api_manager import APIManager
 
@@ -64,6 +65,7 @@ class CustomerAPI:
         sync_customers(page_limit: int = 50):
             Synchronizes customer data between the API and database, logging progress and results.
     """
+
     def __init__(self, merchant_id: str):
         # Initialize token provider to get access token
         provider = TokenProvider()
@@ -79,12 +81,19 @@ class CustomerAPI:
         """
         Generates pages of customer records from the API.
 
+        Uses exponential delay to delay API requests in case of rate limit error.
+
         Params:
             page_limit (int): Limit of records per page
 
         Yields:
             list: List of Customer objects from API.
         """
+        # Set initial values for exponential delay
+        delay = INITIAL_DELAY
+        base = DECAY_BASE
+        retries = 1
+
         try:
             api_response = self.client.customers.list(
                 limit=page_limit,
@@ -92,8 +101,17 @@ class CustomerAPI:
                 sort_order='DESC'
             )
         except ApiError as e:
-            logger.error(f"Error fetching paginated customers: {e}")
-            return
+            if e.status_code == 429 and retries <= MAX_RETRIES:
+                logger.warning(f"Rate limit exceeded. Retrying after delay. Attempt {retries}")
+
+                # Retry logic for rate limit errors
+                delay = base ** retries  # Exponential backoff
+                time.sleep(delay)
+
+                retries += 1
+            else:
+                logger.error(f"Error fetching paginated customers: {e}")
+                return
 
         for page in api_response.iter_pages():
             yield page

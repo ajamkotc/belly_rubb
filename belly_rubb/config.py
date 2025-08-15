@@ -25,6 +25,10 @@ SRC_DIR = PROJ_ROOT / "belly_rubb"
 CONFIG_DIR = SRC_DIR / "config"
 API_TABLE_METHODS = CONFIG_DIR / "api_table_methods.json"
 
+MAX_RETRIES = 5
+INITIAL_DELAY = 1
+DECAY_BASE = 2
+
 # If tqdm is installed, configure loguru with tqdm.write
 # https://github.com/Delgan/loguru/issues/135
 try:

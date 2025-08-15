@@ -29,6 +29,7 @@ Dependencies:
 Usage:
     Instantiate PaymentAPI with a merchant ID and call sync_payments() to sync payment data.
 """
+import time
 from dateutil import parser
 from loguru import logger
 from square import Square
@@ -37,6 +38,7 @@ from sqlalchemy.dialects.sqlite import insert
 
 from app.db import Session
 from app.db_models import Payment
+from belly_rubb.config import MAX_RETRIES, INITIAL_DELAY, DECAY_BASE
 from belly_rubb.etl.token_provider import TokenProvider
 from belly_rubb.etl.api_manager import APIManager
 
@@ -75,14 +77,21 @@ class PaymentAPI:
 
     def _paginated_payments(self, page_limit: int = 50):
         """
-        Generates pages of customer records from the API.
+        Generates pages of payment records from the API.
+
+        Uses exponential delay to delay API requests in case of rate limit error.
 
         Params:
             page_limit (int): Limit of records per page
 
         Yields:
-            list: List of Customer objects from API.
+            list: List of Payment objects from API.
         """
+        # Set initial values for exponential delay
+        delay = INITIAL_DELAY
+        retries = 1
+        base = DECAY_BASE
+
         try:
             api_response = self.client.payments.list(
                 limit=page_limit,
@@ -90,8 +99,17 @@ class PaymentAPI:
                 sort_order='DESC'
             )
         except ApiError as e:
-            logger.error(f"Error fetching paginated customers: {e}")
-            return
+            if e.status_code == 429 and retries <= MAX_RETRIES:
+                logger.warning(f"Rate limit exceeded. Retrying after delay. Attempt {retries}")
+
+                # Retry logic for rate limit errors
+                delay = base ** retries  # Exponential backoff
+                time.sleep(delay)
+
+                retries += 1
+            else:
+                logger.error(f"Error fetching paginated payments: {e}")
+                return
 
         for page in api_response.iter_pages():
             yield page
