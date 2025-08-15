@@ -19,11 +19,13 @@ from .group import Group
 from .customer import Customer
 from .group_membership import GroupMembership
 from .sync_state import SyncState
+from .payment import Payment
 
 __all__ = [
     "AccessToken",
     "Customer",
     "GroupMembership",
     "Group",
-    "SyncState"
+    "SyncState",
+    "Payment"
 ]
