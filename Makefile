@@ -15,8 +15,6 @@ PYTHON_INTERPRETER = python
 .PHONY: requirements
 requirements:
 	conda env update --name $(PROJECT_NAME) --file environment.yml --prune
-	
-
 
 
 ## Delete all compiled Python files
@@ -32,12 +30,12 @@ lint:
 	ruff format --check
 	ruff check
 
+
 ## Format source code with ruff
 .PHONY: format
 format:
 	ruff check --fix
 	ruff format
-
 
 
 ## Run tests

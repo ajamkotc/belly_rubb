@@ -23,8 +23,12 @@ Database Schema
 * **Columns**:
 
     * `id` (varchar) - primary key - Customer's unique identifier.
+    * `created_at` (timestamp) - Timestamp of when customer record was created.
+    * `updated_at` (timestamp) - Timestamp of latest update to ercord.
+    * `given_name` (varchar) - First name of customer.
+    * `family_name` (varchar) - Last name of customer, defaults to `""`.
     * `locality` (varchar) - The locality or area of a customer.
-    * `postal_code` (varchar) - Postal code associated with the customer.
+    * `postal_code` (integer) - Postal code associated with the customer.
     * `reference_id` (varchar) - External reference identifier for the customer.
     * `note` (varchar) - Additional notes or comments about the customer.
     * `creation_source` (varchar) - Source from which the customer record was created.
@@ -43,3 +47,11 @@ Database Schema
     * `id` (varchar) - primary key - Row number.
     * `customer_id` (varchar) - foreign key - Links to customer `id`.
     * `group_id` (varchar) - foreign key - Links to group `id`.
+
+### sync_states
+* **Purpose**: Stores the sync states for table resources.
+* **Columns**:
+
+    * `resource` (varchar) - primary key - Name of resource.
+    * `last_synced` (timestamp) - Date it was last synced.
+    * `updated` (timestamp) - Date record was updated.

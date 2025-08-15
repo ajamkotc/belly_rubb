@@ -37,11 +37,11 @@ class AccessToken(Base):
     merchant_id = Column(String, primary_key=True)
     access_token = Column(String)
     token_type = Column(String)
-    expires_at = Column(DateTime)
+    expires_at = Column(String)
     refresh_token = Column(String)
     short_lived = Column(Boolean, default=False)
-    refresh_token_expires_at = Column(DateTime)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    refresh_token_expires_at = Column(String)
+    created_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"<AccessToken(merchant_id={self.merchant_id}, access_token={self.access_token})>"

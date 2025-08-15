@@ -5,7 +5,11 @@
         body {
             font-family: sans-serif;
             text-align: center;
-            padding-top: 100px;
+            padding-top: 50px;
+        }
+        img.logo {
+            width: 150px;
+            margin-bottom: 20px;
         }
         .button {
             background-color: #0072CE;
@@ -24,6 +28,7 @@
     </style>
 </head>
 <body>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
     <h1>Authorize Arsen's App with Square</h1>
     <a href="/auth" class="button">Connect Square</a>
 </body>

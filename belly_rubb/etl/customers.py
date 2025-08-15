@@ -1,0 +1,187 @@
+"""
+Module: customers.py
+
+This module provides the CustomerAPI class for synchronizing customer data
+between an external API (Square) and a local database.
+
+Classes:
+    CustomerAPI:
+        - Provides methods to interact with customer data from the Square API.
+        - Handles authentication, API requests, pagination, and database synchronization.
+        - Methods:
+            - __init__(merchant_id: str): Initializes the API client and synchronization manager.
+            - pull_customers(page_limit: int): Retrieves customer records from the API.
+            - store_customer_info(customer_info: dict): Inserts or updates customer data 
+                                                            in the database.
+            - sync_customers(page_limit: int = 50): Synchronizes customer data between the API
+                                                            and the database.
+
+Dependencies:
+    - dateutil.parser: For parsing ISO date strings.
+    - square.Square: Square API client.
+    - loguru.logger: Logging utility.
+    - sqlalchemy.dialects.sqlite.insert: For upsert operations in SQLite.
+    - app.db.Session: SQLAlchemy session for database operations.
+    - app.db_models.Customer: SQLAlchemy model for customer records.
+    - belly_rubb.etl.token_provider.TokenProvider: Provides API access tokens.
+    - belly_rubb.etl.api_manager.APIManager: Manages API synchronization and record iteration.
+
+Usage:
+    Instantiate CustomerAPI with a merchant ID and call sync_customers() to sync customer data.
+"""
+from dateutil import parser
+
+from square import Square
+from loguru import logger
+
+from sqlalchemy.dialects.sqlite import insert
+
+from app.db import Session
+from app.db_models import Customer
+from belly_rubb.etl.token_provider import TokenProvider
+from belly_rubb.etl.api_manager import APIManager
+
+class CustomerAPI:
+    """
+    CustomerAPI provides methods to interact with customer data from an external API.
+
+    Downloaded records are synchronized with a local database.
+
+    Attributes:
+        client (Square): Instance of the Square API client for making customer-related API requests.
+        api_manager (APIManager): Manages API synchronization state and record iteration.
+
+    Methods:
+        __init__(merchant_id: str):
+            Initializes the CustomerAPI with the merchant ID, sets up authentication,
+                and prepares API clients.
+        pull_customers(page_limit: int):
+            Retrieves customer records from the API in a paginated manner,
+                yielding individual customer records.
+        store_customer_info(customer_info: dict) -> None:
+            Inserts or updates customer information in the database.
+                Handles conflicts by updating existing records.
+        sync_customers(page_limit: int = 50):
+            Synchronizes customer data between the API and database, logging progress and results.
+    """
+    def __init__(self, merchant_id: str):
+        # Initialize token provider to get access token
+        provider = TokenProvider()
+        access_token = provider.get_access_token(merchant_id=merchant_id)
+
+        # Square client to make API requests
+        self.client = Square(token=access_token)
+
+        # API Manager for handling synchronization state
+        self.api_manager = APIManager()
+
+    def pull_customers(self, page_limit: int):
+        """
+        Retrieves customer records from the API in a paginated manner.
+
+        Args:
+            page_limit (int): The maximum number of customer records to retrieve per API request.
+
+        Yields:
+            dict: Individual customer records obtained from the API.
+
+        Notes:
+            - The method uses a cursor-based pagination to fetch all available customer records.
+            - Records are sorted by 'created_at' in descending order.
+            - If the API request fails or no customers are found, the process stops.
+        """
+        # Set initial cursor
+        cursor = None
+
+        # Loop until no more pages
+        while True:
+            # Attempt API request
+            api_response = self.client.customers.list(
+                limit=page_limit,
+                sort_field='created_at',
+                sort_order='DESC',
+                cursor=cursor
+            )
+
+            # Check if API response is successful
+            if not api_response.is_success():
+                logger.info("No customers found or API request failed.")
+                break
+
+            # Extract body from API response
+            data = api_response.body
+
+            # Iterate over customer records
+            yield from self.api_manager.iter_records(
+                records=data.get('customers', []),
+                resource='customers')
+
+            # Get cursor for next page
+            cursor = data.get('cursor')
+            if not cursor:
+                break
+
+    def store_customer_info(self, customer_info: dict) -> None:
+        """
+        Inserts or updates customer information in the database.
+
+        If a customer with the given 'id' already exists, their record is updated
+        with the new information. Otherwise, a new customer record is created.
+
+        Args:
+            customer_info (dict): A dictionary containing customer details. Expected keys:
+                - 'id' (str): Unique identifier for the customer.
+                - 'address' (dict): Dictionary with keys 'locality' and 'postal_code'.
+                - 'reference_id' (str): Reference identifier for the customer.
+                - 'note' (str): Additional notes about the customer.
+                - 'creation_source' (str,): Source of customer creation.
+
+        Returns:
+            None
+        """
+        address = customer_info.get('address', value={}) # Have default in case empty
+
+        # Attempt to insert Customer into table
+        stmt = insert(Customer).values(
+            id=customer_info.get('id'),
+            created_at=parser.isoparse(customer_info.get('created_at')),
+            updated_at=parser.isoparse(customer_info.get('updated_at')),
+            given_name=customer_info.get('given_name'),
+            family_name=customer_info.get('family_name'),
+            locality=address.get('locality'),
+            postal_code=address.get('postal_code'),
+            reference_id=customer_info.get('reference_id'),
+            note=customer_info.get('note'),
+            creation_source=customer_info.get('creation_source')
+        )
+
+        # Create dictionary mapping updated values to current entry in db
+        update_dict = {}
+        for col in Customer.__table__.columns:
+            if col.name not in ['id', 'created_at']:
+                update_dict[col.name] = stmt.excluded[col.name]
+
+        with Session() as session_db:
+            # Execute statement and update if conflict occurs
+            session_db.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
+            session_db.commit()
+
+    def sync_customers(self, page_limit: int=50):
+        """
+        Synchronizes customer data between the API and the database.
+
+        Args:
+            page_limit (int): The maximum number of records to retrieve per API request.
+
+        Returns:
+            None
+        """
+        logger.info("Starting customer synchronization process.")
+
+        # Loop through customer records
+        for customer in self.pull_customers(page_limit=page_limit):
+            # Store customer record in database
+            self.store_customer_info(customer)
+            logger.debug(f"Stored customer record: {customer.get('id')}")
+
+        logger.success("Customer synchronization process completed successfully.")

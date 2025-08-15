@@ -1,9 +1,42 @@
 <html>
 <head>
     <title>Square OAuth</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        img.logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0072CE;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 16px;
+            color: #333;
+        }
+        .success-icon {
+            font-size: 48px;
+            color: green;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h2>✅ Authorization Complete</h2>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    <div class="success-icon">✅</div>
+    <h2>Authorization Complete</h2>
     <p>You can now close this window and return to the app.</p>
 </body>
 </html>

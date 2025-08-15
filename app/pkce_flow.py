@@ -24,24 +24,20 @@ Usage:
 Run this module to start the Flask application
     and expose endpoints for OAuth authentication with Square.
 """
-import os
 import secrets
 import hashlib
 import base64
+from datetime import timezone, datetime
 import requests
 from flask import Flask, render_template, session, redirect, request
-from dotenv import load_dotenv
 from dateutil import parser
 from loguru import logger
+from sqlalchemy.dialects.sqlite import insert
 
 from app.config import SCOPE_STRING, AUTH_URL, SESSION, POST_TOKEN_URL, REDIRECT_URI, \
-    CODE_CHALLENGE_METHOD, PORT
+    CODE_CHALLENGE_METHOD, PORT, SQUARE_APPLICATION_ID
 from app.db import Session, init_db
-from app.db_models import AccessToken
-
-load_dotenv()
-APPLICATION_ID = os.getenv("SQUARE_APPLICATION_ID")
-APPLICATION_SECRET = os.getenv("SQUARE_APPLICATION_SECRET")
+from app.db_models.access_token import AccessToken
 
 app = Flask(__name__)
 app.secret_key = secrets.token_urlsafe(32)
@@ -99,7 +95,7 @@ def auth():
     # Generate authorization url
     auth_url = (
         AUTH_URL +
-        f"client_id={APPLICATION_ID}"
+        f"client_id={SQUARE_APPLICATION_ID}"
         f"&scope={SCOPE_STRING}"
         f"&session={SESSION}"
         f"&state={state}"
@@ -110,6 +106,20 @@ def auth():
     logger.debug(f"Generated authorization URL: {auth_url}")
     return redirect(auth_url)
 
+def iso_to_utc(date: datetime) -> str:
+    """
+    Converts an ISO 8601 formatted string to UTC.
+
+    Args:
+        date (datetime): The datetime object to convert.
+
+    Returns:
+        str: The UTC formatted string.
+    """
+    if date.tzinfo is not None:
+        date = date.astimezone(timezone.utc)
+    return date.isoformat().replace("+00:00", "Z")
+
 def store_token_info(token_info: dict) -> None:
     """
     Stores the access token information in the database.
@@ -117,23 +127,31 @@ def store_token_info(token_info: dict) -> None:
     Args:
         token_info (dict): The token information returned from the OAuth server.
     """
-    session_db = Session()
-    access_token = AccessToken(
+    stmt = insert(AccessToken).values(
         merchant_id=token_info['merchant_id'],
         access_token=token_info['access_token'],
         token_type=token_info['token_type'],
-        expires_at=parser.isoparse(token_info['expires_at']),
+        expires_at=iso_to_utc(parser.isoparse(token_info.get('expires_at'))),
         refresh_token=token_info.get('refresh_token'),
         short_lived=token_info.get('short_lived', False),
-        refresh_token_expires_at=parser.isoparse(
-            token_info.get('refresh_token_expires_at', 0))
+        refresh_token_expires_at=iso_to_utc(parser.isoparse(
+            token_info.get('refresh_token_expires_at')))
     )
+    # Generate update dictionary if access token already exists for merchant
+    update_dict = {}
+    for col in AccessToken.__table__.columns:
+        if col.name not in ['merchant_id', 'created_at']:
+            update_dict[col.name] = stmt.excluded[col.name]
 
-    logger.debug(f"Storing token info: {access_token}")
+    # If an access token already exists for the merchant, update it
+    stmt = stmt.on_conflict_do_update(index_elements=['merchant_id'], set_=update_dict)
 
-    session_db.add(access_token)
-    session_db.commit()
-    session_db.close()
+    # Store access token
+    logger.info('Storing access token')
+
+    with Session() as session_db:
+        session_db.execute(stmt)
+        session_db.commit()
 
     logger.success("Token information stored successfully.")
 
@@ -150,6 +168,7 @@ def callback():
     """
     # Check CSRF state
     if request.args.get('state') != session.get('state'):
+        print(request.args.get('state'), session.get('state'))
         return "Invalid state. Possible CSRF attack", 400
     logger.info('OAuth callback received and state verified')
 
@@ -171,7 +190,7 @@ def callback():
             "Content-Type": "application/json"
         },
         json={
-            "client_id": APPLICATION_ID,
+            "client_id": SQUARE_APPLICATION_ID,
             "grant_type": "authorization_code",
             "redirect_uri": REDIRECT_URI,
             "code": auth_code,

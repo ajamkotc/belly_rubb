@@ -12,15 +12,18 @@ __all__:
     - Customer
     - GroupMembership
     - Group
+    - SyncState
 """
 from .access_token import AccessToken
 from .group import Group
 from .customer import Customer
 from .group_membership import GroupMembership
+from .sync_state import SyncState
 
 __all__ = [
     "AccessToken",
     "Customer",
     "GroupMembership",
-    "Group"
+    "Group",
+    "SyncState"
 ]

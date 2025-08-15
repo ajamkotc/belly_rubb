@@ -24,7 +24,7 @@ Base = declarative_base()
 load_dotenv()
 DB_PATH = os.getenv(key="DB_PATH", default="sqlite:///bellyrub.db")
 
-engine = create_engine(DB_PATH, echo=True)
+engine = create_engine(DB_PATH)
 Session = sessionmaker(bind=engine)
 
 def init_db():

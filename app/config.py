@@ -11,6 +11,12 @@ Attributes:
     POST_TOKEN_URL (str): URL for exchanging authorization code for access token.
     PORT (int): Port number for running the local application.
 """
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+SQUARE_APPLICATION_ID = os.getenv("SQUARE_APPLICATION_ID")
+SQUARE_APPLICATION_SECRET = os.getenv("SQUARE_APPLICATION_SECRET")
 
 # Requested permissions
 SCOPES = [
@@ -22,7 +28,7 @@ SCOPES = [
 
 # Authorization parameters
 SCOPE_STRING = '+'.join(SCOPES)
-REDIRECT_URI = "https://14b27a24fbd4.ngrok-free.app/callback"
+REDIRECT_URI = "https://d5bb83e899b7.ngrok-free.app/callback"
 SESSION = False
 CODE_CHALLENGE_METHOD = "S256"
 

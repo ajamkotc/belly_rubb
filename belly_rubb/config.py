@@ -21,6 +21,10 @@ MODELS_DIR = PROJ_ROOT / "models"
 REPORTS_DIR = PROJ_ROOT / "reports"
 FIGURES_DIR = REPORTS_DIR / "figures"
 
+SRC_DIR = PROJ_ROOT / "belly_rubb"
+CONFIG_DIR = SRC_DIR / "config"
+API_TABLE_METHODS = CONFIG_DIR / "api_table_methods.json"
+
 # If tqdm is installed, configure loguru with tqdm.write
 # https://github.com/Delgan/loguru/issues/135
 try:
