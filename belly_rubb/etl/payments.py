@@ -30,10 +30,13 @@ Usage:
     Instantiate PaymentAPI with a merchant ID and call sync_payments() to sync payment data.
 """
 import time
+from datetime import datetime
 from dateutil import parser
 from loguru import logger
 from square import Square
 from square.core.api_error import ApiError
+
+from sqlalchemy import select, func
 from sqlalchemy.dialects.sqlite import insert
 
 from app.db import Session
@@ -171,6 +174,12 @@ class PaymentAPI:
             # Execute statement and update if conflict occurs
             session_db.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
             session_db.commit()
+
+    def get_most_recent_payment(self, session):
+        stmt = select(func.max(Payment.updated_at))
+
+        result = session.execute(stmt).scalar_one()
+        return result
 
     def sync_payments(self, page_limit: int = 50):
         """
