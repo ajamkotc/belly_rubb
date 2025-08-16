@@ -30,12 +30,14 @@ Usage:
     Instantiate PaymentAPI with a merchant ID and call sync_payments() to sync payment data.
 """
 import time
+from datetime import datetime, timezone
 from dateutil import parser
 from loguru import logger
 from square import Square
 from square.core.api_error import ApiError
 from sqlalchemy.dialects.sqlite import insert
 
+from app.pkce_flow import iso_to_utc
 from app.db import Session
 from app.db_models import Payment
 from belly_rubb.config import MAX_RETRIES, INITIAL_DELAY, DECAY_BASE
@@ -95,7 +97,7 @@ class PaymentAPI:
         try:
             api_response = self.client.payments.list(
                 limit=page_limit,
-                sort_field='CREATED_AT',
+                sort_field='UPDATED_AT',
                 sort_order='DESC'
             )
         except ApiError as e:
@@ -114,7 +116,7 @@ class PaymentAPI:
         for page in api_response.iter_pages():
             yield page
 
-    def _store_payment_info(self, payment_info: dict) -> None:
+    def _store_payment_info(self, payment_info: dict, session) -> None:
         """
         Inserts or updates payment information in the database.
 
@@ -135,6 +137,7 @@ class PaymentAPI:
                 - 'location_id' (str): Identifier for the location where the payment was made.
                 - 'order_id' (str): Foreign key referencing the associated order.
                 - 'square_product' (str): Product identifier from Square.
+            session: Database session to use for the operation.
 
         Returns:
             None
@@ -167,10 +170,9 @@ class PaymentAPI:
             if col.name not in ['id', 'created_at']:
                 update_dict[col.name] = stmt.excluded[col.name]
 
-        with Session() as session_db:
-            # Execute statement and update if conflict occurs
-            session_db.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
-            session_db.commit()
+        # Execute statement and update if conflict occurs
+        session.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
+
 
     def sync_payments(self, page_limit: int = 50):
         """
@@ -184,19 +186,30 @@ class PaymentAPI:
         """
         logger.info("Starting payment synchronization process...")
         count_of_records = 0
+        last_synced = iso_to_utc(datetime.now(timezone.utc))
 
-        # Loop through payment records.
-        for page in self._paginated_payments(page_limit=page_limit):
-            # Loop through records on page
-            for payment in self.api_manager.iter_records(records=page, resource='payments'):
-                print(f"Processing payment: {payment.id}")
-                print(payment.dict())
-                self._store_payment_info(payment.dict())
+        with Session() as session_db:
+            # Loop through payment records.
+            for page in self._paginated_payments(page_limit=page_limit):
+                # Loop through records on page
+                for payment in self.api_manager.iter_records(
+                    records=page, resource='payments', sorted_by_updated=True):
+                    # Store payment data
+                    self._store_payment_info(payment.dict(), session=session_db)
 
-                count_of_records += 1
+                    count_of_records += 1
 
-        logger.success(f"Payment synchronization process completed. " \
-                    f"Total records processed: {count_of_records}")
+            logger.success(f"Payment synchronization process completed. " \
+                            f"Total records processed: {count_of_records}")
+            last_synced = iso_to_utc(datetime.now(timezone.utc))
+
+            # Upsert sync state
+            self.api_manager.upsert_sync_state(
+                resource='payments',
+                last_synced=last_synced,
+                session=session_db
+            )
+            session_db.commit()
 
 if __name__ == "__main__":
     payment_sync = PaymentAPI(merchant_id="MLW4W4RYAASNM")

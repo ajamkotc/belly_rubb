@@ -30,6 +30,7 @@ Usage:
     Instantiate CustomerAPI with a merchant ID and call sync_customers() to sync customer data.
 """
 import time
+from datetime import datetime, timezone
 from dateutil import parser
 from square import Square
 from square.core.api_error import ApiError
@@ -37,6 +38,7 @@ from loguru import logger
 
 from sqlalchemy.dialects.sqlite import insert
 
+from app.pkce_flow import iso_to_utc
 from app.db import Session
 from app.db_models import Customer
 from belly_rubb.config import MAX_RETRIES, INITIAL_DELAY, DECAY_BASE
@@ -116,7 +118,7 @@ class CustomerAPI:
         for page in api_response.iter_pages():
             yield page
 
-    def _store_customer_info(self, customer_info: dict) -> None:
+    def _store_customer_info(self, customer_info: dict, session) -> None:
         """
         Inserts or updates customer information in the database.
 
@@ -130,6 +132,7 @@ class CustomerAPI:
                 - 'reference_id' (str): Reference identifier for the customer.
                 - 'note' (str): Additional notes about the customer.
                 - 'creation_source' (str,): Source of customer creation.
+            session: Database session to use for the operation.
 
         Returns:
             None
@@ -156,10 +159,8 @@ class CustomerAPI:
             if col.name not in ['id', 'created_at']:
                 update_dict[col.name] = stmt.excluded[col.name]
 
-        with Session() as session_db:
-            # Execute statement and update if conflict occurs
-            session_db.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
-            session_db.commit()
+        # Execute statement and update if conflict occurs
+        session.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
 
     def sync_customers(self, page_limit: int=50) -> None:
         """
@@ -173,18 +174,28 @@ class CustomerAPI:
         """
         logger.info("Starting customer synchronization process.")
         count_of_records = 0
+        last_synced = iso_to_utc(datetime.now(timezone.utc))
 
-        # Loop through customer records
-        for page in self._paginated_customers(page_limit=page_limit):
-            # Loop through records in page
-            for record in self.api_manager.iter_records(records=page, resource='customers'):
-                # Store customer data
-                self._store_customer_info(record.dict())
+        with Session() as session_db:
+            # Loop through customer records
+            for page in self._paginated_customers(page_limit=page_limit):
+                # Loop through records in page
+                for record in self.api_manager.iter_records(records=page, resource='customers'):
+                    # Store customer data
+                    self._store_customer_info(record.dict(), session_db)
 
-                count_of_records += 1
+                    count_of_records += 1
 
-        logger.success(f"Customer synchronization process completed successfully. "
-                       f"Stored {count_of_records} records.")
+                last_synced = iso_to_utc(datetime.now(timezone.utc))
+
+            # Upsert sync state
+            self.api_manager.upsert_sync_state(
+                resource='customers',
+                session=session_db,
+                last_synced=last_synced)
+
+            logger.success(f"Customer synchronization process completed successfully. "
+                            f"Stored {count_of_records} records.")
 
 if __name__ == "__main__":
     customer_sync = CustomerAPI(merchant_id="MLW4W4RYAASNM")

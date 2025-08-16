@@ -11,7 +11,7 @@ Classes:
                 Determines if a record's creation date is more recent than the last sync date
                 for the specified resource.
 """
-from datetime import datetime, timezone
+from datetime import datetime
 from loguru import logger
 from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
@@ -19,7 +19,6 @@ from dateutil import parser
 
 from app.db import Session
 from app.db_models import SyncState
-from app.pkce_flow import iso_to_utc
 
 class APIManager:
     """
@@ -34,7 +33,7 @@ class APIManager:
         _is_recent(resource: str, record_date: datetime, session) -> bool:
             Checks if a record's creation date is more recent than the last sync date
                 for a given resource.
-        _upsert_sync_state(resource: str, session) -> None:
+        _upsert_sync_state(resource: str, session, last_synced: datetime) -> None:
             Inserts or updates the synchronization state for a resource in the database.
         iter_records(records: list, resource: str):
             Yields records that have been updated since the last synchronization and
@@ -67,7 +66,7 @@ class APIManager:
 
         return record_date > parser.isoparse(sync_state.last_synced)
 
-    def _upsert_sync_state(self, resource: str, session) -> None:
+    def upsert_sync_state(self, resource: str, session, last_synced: datetime) -> None:
         """
         Upserts the synchronization state for the current resource in the database.
 
@@ -80,17 +79,18 @@ class APIManager:
         Params:
             resource (str): Resource to update.
             session: Database session to use for the operation.
+            last_synced (datetime): The last synchronized timestamp.
 
         Returns:
             None
         """
         stmt = insert(SyncState).values(
             resource=resource,
-            last_synced=iso_to_utc(datetime.now(timezone.utc))
+            last_synced=last_synced
         )
 
         update_dict = {
-            "last_synced": iso_to_utc(datetime.now(timezone.utc))
+            "last_synced": last_synced
         }
         stmt = stmt.on_conflict_do_update(index_elements=['resource'], set_=update_dict)
 
@@ -98,7 +98,7 @@ class APIManager:
 
         session.execute(stmt)
 
-    def iter_records(self, records: list, resource: str):
+    def iter_records(self, records: list, resource: str, sorted_by_updated: bool = False):
         """
         Iterates over a list of records and yields recently updated records.
 
@@ -109,21 +109,21 @@ class APIManager:
             records (list): A list containing record data.
                 Each record should have an 'updated_at' field.
             resource (str): Name of the resource being synchronized.
+            sorted_by_updated (bool): If True, stops iterating when a record is found that
+                is not recent, assuming records are sorted by 'updated_at'.
 
         Yields:
             dict: Records that have been updated since the last synchronization.
         """
         with Session() as session:
             with session.begin():
-                try:
-                    for record in records:
-                        # Get date record was updated
-                        record_updated = parser.isoparse(record.updated_at)
+                for record in records:
+                    # Get date record was updated
+                    record_updated = parser.isoparse(record.updated_at)
 
-                        # Check if record updated since last sync
-                        if self._is_recent(resource, record_updated, session):
-                            yield record
-                finally:
-                    # Update sync state
-                    self._upsert_sync_state(resource, session)
-                    logger.success(f"Sync state updated for resource: {resource}")
+                    # Check if record updated since last sync
+                    if self._is_recent(resource, record_updated, session):
+                        yield record
+                    else:
+                        if sorted_by_updated:
+                            break
