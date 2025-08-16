@@ -30,11 +30,17 @@ Usage:
     Instantiate PaymentAPI with a merchant ID and call sync_payments() to sync payment data.
 """
 import time
+<<<<<<< HEAD
 from datetime import datetime, timezone
+=======
+from datetime import datetime
+>>>>>>> 8fba5b64c3b48975e03f8a792eb695cf9bc01310
 from dateutil import parser
 from loguru import logger
 from square import Square
 from square.core.api_error import ApiError
+
+from sqlalchemy import select, func
 from sqlalchemy.dialects.sqlite import insert
 
 from app.pkce_flow import iso_to_utc
@@ -173,6 +179,12 @@ class PaymentAPI:
         # Execute statement and update if conflict occurs
         session.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
 
+
+    def get_most_recent_payment(self, session):
+        stmt = select(func.max(Payment.updated_at))
+
+        result = session.execute(stmt).scalar_one()
+        return result
 
     def sync_payments(self, page_limit: int = 50):
         """
