@@ -5,6 +5,9 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(String, primary_key=True)
+    location_id = Column(String, ForeignKey("payments.location_id"))
+    created_at = Column(String)
+    updated_at = Column(String)
     customer_id = Column(String, ForeignKey("customers.id"))
 
     def __repr__(self):

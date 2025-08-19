@@ -13,6 +13,8 @@ Classes:
             - _paginated_payments(page_limit: int): Retrieves payment records from the API.
             - _store_payment_info(payment_info: dict): Inserts or updates payment data
                                                             in the database.
+            - get_most_recent_payment(session) -> datetime: Retrieves the most recent payment
+                                                            timestamp from the database.
             - sync_payments(page_limit: int = 50): Synchronizes payment data between the API
                                                             and the database.
 
@@ -30,11 +32,7 @@ Usage:
     Instantiate PaymentAPI with a merchant ID and call sync_payments() to sync payment data.
 """
 import time
-<<<<<<< HEAD
 from datetime import datetime, timezone
-=======
-from datetime import datetime
->>>>>>> 8fba5b64c3b48975e03f8a792eb695cf9bc01310
 from dateutil import parser
 from loguru import logger
 from square import Square
@@ -69,6 +67,8 @@ class PaymentAPI:
         _store_payment_info(payment_info: dict) -> None:
             Inserts or updates payment information in the database.
                 Handles conflicts by updating existing records.
+        get_most_recent_payment(session) -> datetime:
+            Retrieves the most recent payment timestamp from the database.
         sync_payments(page_limit: int = 50):
             Synchronizes payment data between the API and database, logging progress and results.
     """
@@ -179,11 +179,20 @@ class PaymentAPI:
         # Execute statement and update if conflict occurs
         session.execute(stmt.on_conflict_do_update(index_elements=['id'], set_=update_dict))
 
+    def get_most_recent_payment(self, session) -> datetime:
+        """
+        Gets the most recently updated payment.
 
-    def get_most_recent_payment(self, session):
+        Params:
+            session: Database session to use for the operation.
+
+        Returns:
+            result (datetime): The timestamp of the most recently updated payment.
+        """
         stmt = select(func.max(Payment.updated_at))
 
         result = session.execute(stmt).scalar_one()
+
         return result
 
     def sync_payments(self, page_limit: int = 50):
@@ -226,3 +235,4 @@ class PaymentAPI:
 if __name__ == "__main__":
     payment_sync = PaymentAPI(merchant_id="MLW4W4RYAASNM")
     payment_sync.sync_payments()
+    print(payment_sync.get_most_recent_payment(session=Session()))

@@ -20,6 +20,7 @@ from .customer import Customer
 from .group_membership import GroupMembership
 from .sync_state import SyncState
 from .payment import Payment
+from .order import Order
 
 __all__ = [
     "AccessToken",
@@ -27,5 +28,6 @@ __all__ = [
     "GroupMembership",
     "Group",
     "SyncState",
-    "Payment"
+    "Payment",
+    "Order"
 ]

@@ -46,3 +46,6 @@ def init_db():
     from app.db_models.order import Order
 
     Base.metadata.create_all(engine)
+
+if __name__ == "__main__":
+    init_db()

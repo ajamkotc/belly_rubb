@@ -18,8 +18,10 @@ dependencies:
   - ruff
   - pytest
   - flask
+  - seaborn
   - pip:
     - python-dotenv
     - mkdocs
     - -e .
     - squareup
+    - pre-commit
