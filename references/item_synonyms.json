@@ -1,0 +1,250 @@
+{
+    "pork belly bites":
+    {
+        "base_name": "pork belly bites",
+        "aliases": ["BELLY BITES", "PORK BELLY BITES"],
+        "variations": {
+            "regular": [
+                "Regular",
+                "4 Bites",
+                "2 Bites",
+                "8 Bites",
+                "6 Bites"
+            ]
+        }
+    },
+    "mozzarella sticks":
+    {
+        "base_name": "mozzarella sticks",
+        "aliases": ["MOZZARELLA STICKS"],
+        "variations": {
+            "3 pcs": ["3 pcs"],
+            "6 pcs": ["6 pcs"],
+            "9 pcs": ["9 pcs"]
+        }
+    },
+    "loaded fries":
+    {
+        "base_name": "loaded fries",
+        "aliases": ["LOADED FRIES"],
+        "variations": {
+            "regular": [
+                "Regular",
+                "Truffle Salt",
+                "Rosemary Pepper"
+            ]
+        }
+    },
+    "chicken wings":
+    {
+        "base_name": "chicken wings",
+        "aliases": ["CHICKEN WINGS", "FRIED CHICKEN WINGS"],
+        "variations": {
+            "6 pcs": ["6 pcs"],
+            "8 pcs": ["8 pcs"],
+            "12 pcs": ["12 pcs"]
+        }
+    },
+    "grilled sweet corn":
+    {
+        "base_name": "grilled sweet corn",
+        "aliases": ["GRILLED SWEET CORN"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "mac and cheese":
+    {
+        "base_name": "mac and cheese",
+        "aliases": [
+            "ARTISAN MAC AND CHEESE",
+            "MAC&CHEESE",
+            "Artisan Mac and Cheese"
+        ],
+        "variations": {
+            "side": ["Side", "8 oz."],
+            "full": ["Full"]
+        }
+    },
+    "mac and cheese family size":
+    {
+        "base_name": "mac and cheese family size",
+        "aliases": ["Mac’n’Cheese"],
+        "variations": {
+            "half pan": ["Half Pan"],
+            "full pan": ["Full Pan"]
+        }
+    },
+    "baked baby potatoes":
+    {
+        "base_name": "baked baby potatoes",
+        "aliases": ["BAKED BABY POTATOES"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "pear gorgonzola salad":
+    {
+        "base_name": "pear gorgonzola salad",
+        "aliases": ["PEAR GORGONZOLA SALAD"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "pineapple coleslaw":
+    {
+        "base_name": "pineapple coleslaw",
+        "aliases": ["Pineapple Coleslaw", "PINEAPPLE SLAW"],
+        "variations": {
+            "side": ["Side", "8 oz.", "4 oz."],
+            "full": ["Full"]
+        }
+    },
+    "fries":
+    {
+        "base_name": "fries",
+        "aliases": [
+            "CRINKLE FRIES",
+            "CRISPY  FRIES",
+            "French fries"
+        ],
+        "variations": {
+            "side": [
+                "Side",
+                "Side, Rosemary pepper",
+                "Side, Truffle salt",
+                "Rosemary, Side"
+            ],
+            "full": [
+                "Full",
+                "Full, Truffle salt",
+                "Full, Rosemary pepper",
+                "Rosemary, Full"
+            ]
+        }
+    },
+    "beef back ribs":
+    {
+        "base_name": "beef back ribs",
+        "aliases": ["BEEF BACK RIBS", "Beef Back Ribs"],
+        "variations": {
+            "full rack": ["(Full Rack)", "(FULL RACK)"]
+        }
+    },
+    "beef short ribs":
+    {
+        "base_name": "beef short ribs",
+        "aliases": [
+            "BEEF SHORT RIB",
+            "BEEF SHORT RIBS",
+            "Beef Short Rib"
+        ],
+        "variations": {
+            "full rack": ["(Full Rack)", "(FULL RACK)"],
+            "regular": ["Regular"]
+        }
+    },
+    "baby back pork ribs":
+    {
+        "base_name": "baby back pork ribs",
+        "aliases": [
+            "GLAZED BABY BACK PORK RIBS",
+            "BABY BACK PORK RIBS",
+            "“Get your baby back” Pork Ribs"
+        ],
+        "variations": {
+            "full rack": ["Full Rack"],
+            "half rack": ["Half rack"]
+        }
+    },
+    "dino dinner":
+    {
+        "base_name": "dino dinner",
+        "aliases": ["DINO DINNER"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "short rib platter":
+    {
+        "base_name": "short rib platter",
+        "aliases": ["SHORT RIB PLATTER"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "three bone combo":
+    {
+        "base_name": "three bone combo",
+        "aliases": [
+            "3-BONE MEAL DEAL",
+            "BABY BACK RIB COMBO",
+            "THE BABY BACK COMBO",
+            "BABYBACK RIB COMBO",
+            "BBQ RIB COMBO"
+        ],
+        "variations": {
+            "regular": [
+                "Regular",
+                "Crinkle Fries- Truffle Salt, Mac&Cheese",
+                "Crinkle Fries- Rosemary Pepper"
+            ]
+        }
+    },
+    "beef rack combo":
+    {
+        "base_name": "beef rack combo",
+        "aliases": ["BEEF RACK COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "ribs and wings bundle":
+    {
+        "base_name": "ribs and wings bundle",
+        "aliases": ["RIBS & WINGS BUNDLE", "RIBS & WINGS BUNDLE !BEEF RIBS ONLY!"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "crispy chicken combo":
+    {
+        "base_name": "crispy chicken combo",
+        "aliases": ["CRISPY CHICKEN COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "pork rack combo":
+    {
+        "base_name": "pork rack combo",
+        "aliases": ["PORK RACK COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "pulled sandwich combo":
+    {
+        "base_name": "pulled sandwich combo",
+        "aliases": ["PULLED SANDWICH COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "steak sandwich combo":
+    {
+        "base_name": "steak sandwich combo",
+        "aliases": ["STEAK SANDWICH COMBO", "BEEF SANDWICH COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "wings and fries":
+    {
+        "base_name": "wings and fries",
+        "aliases": ["WINGS & FRIES", "WINGS COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    }
+}

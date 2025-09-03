@@ -19,9 +19,11 @@ dependencies:
   - pytest
   - flask
   - seaborn
+  - rapidfuzz
   - pip:
     - python-dotenv
     - mkdocs
     - -e .
     - squareup
     - pre-commit
+    - missingno
