@@ -246,5 +246,13 @@
         "variations": {
             "regular": ["Regular"]
         }
+    },
+    "the belly combo":
+    {
+        "base_name": "the belly combo",
+        "aliases": ["THE BELLY COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
     }
 }
