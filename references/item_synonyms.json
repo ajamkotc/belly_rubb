@@ -91,6 +91,14 @@
             "regular": ["Regular"]
         }
     },
+    "pear gorgonzola salad full pan":
+    {
+        "base_name": "pear gorgonzola salad full pan",
+        "aliases": ["Pear+Gorgonzola Salad (Full Pan)"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
     "pineapple coleslaw":
     {
         "base_name": "pineapple coleslaw",
@@ -251,6 +259,185 @@
     {
         "base_name": "the belly combo",
         "aliases": ["THE BELLY COMBO"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "crispy chicken sandwich":
+    {
+        "base_name": "crispy chicken sandwich",
+        "aliases": ["CRISPY CHICKEN SANDWICH", "Crispy Chicken Sandwich"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "steak sandwich":
+    {
+        "base_name": "steak sandwich",
+        "aliases": [
+            "CIABATTA STEAK SANDWICH",
+            "1/2 POUND STEAK SANDWICH",
+            "CHIABATTA STEAK SANDWICH",
+            "ULTIMATE STEAK SANDWICH",
+            "STEAK SANDWICH"
+        ],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "pulled beef sandwich":
+    {
+        "base_name": "pulled beef sandwich",
+        "aliases": ["PULLED BEEF SANDWICH"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "boom-boom sauce":
+    {
+        "base_name": "boom-boom sauce",
+        "aliases": ["BOOM-BOOM SAUCE"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "boom-boom sauce 8oz":
+    {
+        "base_name": "boom-boom sauce 8oz",
+        "aliases": ["BOOM-BOOM SAUCE (8 OZ)"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "classy ranch dip":
+    {
+        "base_name": "classy ranch dip",
+        "aliases": ["CLASSY RANCH DIP"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "classy ranch dip 8oz":
+    {
+        "base_name": "classy ranch dip 8oz",
+        "aliases": ["Classy Ranch Sauce (8 oz)", "Ranch (8 oz)"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "blue cheese dip":
+    {
+        "base_name": "blue cheese dip",
+        "aliases": [
+            "CREAMY BLUE CHEESE DIP",
+            "CHUNKY BLUE CHEESE DIP",
+            "BLUE CHEESE SAUCE"
+        ],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "ketchup":
+    {
+        "base_name": "ketchup",
+        "aliases": ["KETCHUP"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "mustard":
+    {
+        "base_name": "mustard",
+        "aliases": ["MUSTARD"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "mayonnaise":
+    {
+        "base_name": "mayonnaise",
+        "aliases": ["MAYONNAISE"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "pickled jalapeno peppers"
+    {
+        "base_name": "pickled jalapeno peppers",
+        "aliases": ["PICKLED JALAPEÑO PEPPERS", "Pickled Jalapeños (8oz)"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "signature bbq dip":
+    {
+        "base_name": "signature bbq dip",
+        "aliases": [
+            "SIGNATURE BBQ DIP",
+            "Signature BBQ Sauce (8 oz)",
+            "SIGNATURE BBQ SAUCE",
+            "BBQ dipping sauce"
+        ],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "sweet and spicy bbq dip":
+    {
+        "base_name": "sweet and spicy bbq dip",
+        "aliases": [
+            "SWEET AND SPICY BBQ DIP",
+            "SWEET AND SPICY BBQ SAUCE",
+            "Sweet’n’Spicy BBQ Sauce (8 oz)"
+        ],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "curry dip":
+    {
+        "base_name": "curry dip",
+        "aliases": ["HOUSE-MADE CURRY DIP", "TANGY & SWEET CURRY DIP"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "cheesecake bites":
+    {
+        "base_name": "cheesecake bites",
+        "aliases": ["CHEESECAKE BITES"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "marsh'n'cookie":
+    {
+        "base_name": "marshncookie",
+        "aliases": ["MARSH'n'COOKIE"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "party package 4-6 ppl":
+    {
+        "base_name": "party package 4-6ppl",
+        "aliases": ["PARTY PACKAGE (4-6ppl)", "Party Package (4-6 ppl)"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "party package 6-8 ppl":
+    {
+        "base_name": "party package 6-8 ppl",
+        "aliases": ["Party Package (6-8 ppl)", "Party Package  (6-8 ppl)"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "party package 10-12 ppl":
+    {
+        "base_name": "party package 10-12 ppl",
+        "aliases": ["Party Package (10-12ppl)", "Party Package (10-12 ppl)"],
         "variations": {
             "regular": ["Regular"]
         }
