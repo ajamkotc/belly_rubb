@@ -1,4 +1,22 @@
 {
+    "slow cooked asparagus":
+    {
+        "base_name": "slow cooked asparagus",
+        "aliases": ["SLOW-COOKED ASPARAGUS"],
+        "variations": {
+            "regular": ["Regular"]
+        }
+    },
+    "belly sliders":
+    {
+        "base_name": "belly sliders",
+        "aliases": ["BELLY SLIDERS"],
+        "variations": {
+            "2 sliders": ["2 sliders"],
+            "4 sliders": ["4 sliders"],
+            "6 sliders": ["6 sliders"]
+        }
+    },
     "pork belly bites":
     {
         "base_name": "pork belly bites",
@@ -16,7 +34,7 @@
     "mozzarella sticks":
     {
         "base_name": "mozzarella sticks",
-        "aliases": ["MOZZARELLA STICKS"],
+        "aliases": ["MOZZARELLA STICKS", "MOZZARELLA WEDGES"],
         "variations": {
             "3 pcs": ["3 pcs"],
             "6 pcs": ["6 pcs"],
@@ -69,7 +87,7 @@
     "mac and cheese family size":
     {
         "base_name": "mac and cheese family size",
-        "aliases": ["Mac’n’Cheese"],
+        "aliases": ["Mac’n’Cheese", "Mac’n’Cheese Family size"],
         "variations": {
             "half pan": ["Half Pan"],
             "full pan": ["Full Pan"]
@@ -361,7 +379,7 @@
             "regular": ["Regular"]
         }
     },
-    "pickled jalapeno peppers"
+    "pickled jalapeno peppers":
     {
         "base_name": "pickled jalapeno peppers",
         "aliases": ["PICKLED JALAPEÑO PEPPERS", "Pickled Jalapeños (8oz)"],
@@ -413,7 +431,7 @@
     "marsh'n'cookie":
     {
         "base_name": "marshncookie",
-        "aliases": ["MARSH'n'COOKIE"],
+        "aliases": ["MARSH’n’COOKIE"],
         "variations": {
             "regular": ["Regular"]
         }
