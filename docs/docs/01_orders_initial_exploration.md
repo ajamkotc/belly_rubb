@@ -105,3 +105,4 @@ Planned cleaning actions:
 * Drop insignificant columns
     * *Fulfillment Notes* does not contain valuable information for modeling or analysis.
     * *Recipient Country* because although it has multiple values, the business only serves food in the US.
+* Aggregate rows to represent individual orders rather than individual menu items per order.
